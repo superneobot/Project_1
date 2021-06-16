@@ -103,14 +103,14 @@ namespace Project_1
                 {
                     for (int i = 0; i < n; i++)
                     {
-                        Account data = new Account();
-                        data.Name = names[i].Text;
-                        data.Login = logins[i].Text;
-                        data.Password = passwords[i].Text;
-                        list.AddData(data);
-                    }
-                    list.SaveListOfDatas("data.xml");
+                    Account data = new Account();
+                    data.Name = names[i].Text;
+                    data.Login = logins[i].Text;
+                    data.Password = passwords[i].Text;
+                    list.AddData(data);
                 }
+                list.SaveListOfDatas("data.xml");
+            }
             }
             catch (Exception err2)
             {
@@ -261,11 +261,12 @@ namespace Project_1
                 newtab.Text = test.Text;
             newtab.Name = "page" + a;
             data.Write(newtab.Name, newtab.Text, "Pages");
+            newtab.Tag = "page"+a.ToString();
             a++;
             pages.Add(newtab);              //добавляние в коллекцию pages
             table.Controls.Add(newtab);     //добавление страницы page на tabcontrol
             table.SelectedTab = newtab;     //выбор активной страницей вновь созданную
-
+            
             //добавление контролов с логинами
             log = new TextBox[n];
             nam = new Label[n];
@@ -276,7 +277,7 @@ namespace Project_1
                 log[i] = new TextBox();
                 log[i].Name = "log" + x;
                 log[i].Text = "";
-                log[i].Tag = x;
+                log[i].Tag = "log"+x.ToString();
                 log[i].Width = 120;
                 log[i].DoubleClick += new EventHandler(loginclick);
                 log[i].Click += new EventHandler(CopyClick);
@@ -285,13 +286,13 @@ namespace Project_1
                 nam[i] = new Label();
                 nam[i].Name = "nam" + x;
                 nam[i].Text = "unnamed";
-                nam[i].Tag = x;
+                nam[i].Tag = "nam"+x.ToString();
                 nam[i].DoubleClick += new EventHandler(nameclick);
 
                 pass[i] = new TextBox();
                 pass[i].Name = "pass" + x;
                 pass[i].Text = "";
-                pass[i].Tag = x;
+                pass[i].Tag = "pass"+x.ToString();
                 pass[i].Width = 120;
                 pass[i].DoubleClick += new EventHandler(passwordclick);
                 pass[i].Click += new EventHandler(CopyClick);
@@ -349,6 +350,7 @@ namespace Project_1
                     newtab[j] = new TabPage();
                     newtab[j].Text = a.ToString();
                     newtab[j].Name = "page" + a;
+                    newtab[j].Tag = "page" + a.ToString();
                     a++;
                     pages.Add(newtab[j]);
                     table.Controls.Add(newtab[j]);
@@ -363,6 +365,7 @@ namespace Project_1
                     {
                         log[i] = new TextBox();
                         log[i].Name = "log" + x;
+                        log[i].Tag = "log"+x.ToString();
                         log[i].Text = "";
                         log[i].Width = 120;
                         log[i].DoubleClick += new EventHandler(loginclick);
@@ -371,11 +374,13 @@ namespace Project_1
 
                         nam[i] = new Label();
                         nam[i].Name = "nam" + x;
+                        nam[i].Tag = "nam"+x.ToString();
                         nam[i].Text = "unnamed";
                         nam[i].DoubleClick += new EventHandler(nameclick);
 
                         pass[i] = new TextBox();
                         pass[i].Name = "pass" + x;
+                        pass[i].Tag = "pass"+x.ToString();
                         pass[i].Text = "";
                         pass[i].Width = 120;
                         pass[i].DoubleClick += new EventHandler(passwordclick);
@@ -501,6 +506,7 @@ namespace Project_1
             if (table.TabPages.Count != 1)
             {
                 var tb = table.SelectedTab;
+
                 table.TabPages.Remove(tb);
                 MessageBox.Show(names.Count.ToString());
                 names.ElementAt(table.TabIndex);
@@ -538,7 +544,7 @@ namespace Project_1
                 else
                 {
                     saveasini();
-                }
+                }                
             }
         }
 

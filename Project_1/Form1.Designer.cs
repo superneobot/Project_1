@@ -53,6 +53,7 @@ namespace Project_1
             this.status = new System.Windows.Forms.StatusStrip();
             this.statuslabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.loadbar = new System.Windows.Forms.ToolStripProgressBar();
+            this.loadcount = new System.Windows.Forms.ToolStripStatusLabel();
             this.typeofsave = new System.Windows.Forms.ToolStripStatusLabel();
             this.trayicon = new System.Windows.Forms.NotifyIcon(this.components);
             this.traymenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -224,6 +225,7 @@ namespace Project_1
             this.status.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslabel,
             this.loadbar,
+            this.loadcount,
             this.typeofsave});
             this.status.Location = new System.Drawing.Point(0, 519);
             this.status.Name = "status";
@@ -381,6 +383,7 @@ namespace Project_1
         private System.Windows.Forms.ToolStripMenuItem writeToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem readToolStripMenuItem1;
         private System.Windows.Forms.ToolStripStatusLabel typeofsave;
+        private System.Windows.Forms.ToolStripStatusLabel loadcount;
         public System.Windows.Forms.ToolStripProgressBar loadbar;
     }
 }
