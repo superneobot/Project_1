@@ -1,0 +1,52 @@
+namespace datas
+{
+   // [Serializable]
+    public class Accounts
+    {
+        [XmlElement("Data")]
+       static public Account acc = new Account();
+        // static public ALogin Login = new ALogin();
+        // static public APassword Password = new APassword();
+        static public Tables tb = new Tables();
+    }
+
+    [Serializable]
+    public class Account
+    {   
+        [XmlElement("Name")]
+        public List<Label> Name { get; set; }
+        [XmlAttribute("Login")]
+        public List<TextBox> Login { get; set; }
+        [XmlAttribute("Password")]
+        public List<TextBox> Password { get; set; }
+
+        public Account()
+        {
+            Name = new List<Label>();
+            Login = new List<TextBox>();
+            Password = new List<TextBox>();
+        }
+
+        public int Count()
+        {
+            return Name.Count + Login.Count + Password.Count;
+        }
+
+        
+     }
+
+    [Serializable]
+    public class Tables
+    {
+        public List<TabPage> Page { get; set; }
+
+        public Tables()
+        {
+            Page = new List<TabPage>();
+        }
+
+        public int Count()
+        {
+            return Page.Count;
+        }
+    }
