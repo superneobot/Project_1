@@ -245,6 +245,11 @@ namespace Project_1
             this.loadbar.Name = "loadbar";
             this.loadbar.Size = new System.Drawing.Size(155, 16);
             // 
+            // loadcount
+            // 
+            this.loadcount.Name = "loadcount";
+            this.loadcount.Size = new System.Drawing.Size(0, 17);
+            // 
             // typeofsave
             // 
             this.typeofsave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;

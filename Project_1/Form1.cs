@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Project_1
@@ -15,22 +16,25 @@ namespace Project_1
     [Serializable]
     public partial class mainfrm : Form
     {
+        [DllImport("user32")]
+        private static extern bool HideCaret(IntPtr hWnd);
         //Создание коллекций контролов
         List<TabPage> pages = new List<TabPage>();
         List<TextBox> logins = new List<TextBox>();
-        List<TextBox> passwords = new List<TextBox>();
+        List<MaskedTextBox> passwords = new List<MaskedTextBox>();
         List<Label> names = new List<Label>();
 
         Datas list = new Datas();
         TextBox[] log;
         Label[] nam;
-        TextBox[] pass;
+        MaskedTextBox[] pass;
         TabPage[] newtab;
         const string Progname = "Twinx v3";
         private bool hide;
         string savingfile;
         string backup;
         int pos;
+        const char mask = '*';
 
         int n = 12;
         int space = 0;
@@ -163,7 +167,7 @@ namespace Project_1
             try
             {
                 var data = new IniFile(@"data.ini");
-                var settings = new IniFile(@"settings.ini");
+              //  var settings = new IniFile(@"settings.ini");
 
                 var allpages = table.TabPages.Cast<TabPage>().ToArray();
                 foreach (TabPage page in allpages)
@@ -188,13 +192,50 @@ namespace Project_1
                 var allpass = passwords.ToArray();
                 for (int i = 0; i < allpass.Length; i++)
                 {
-                    TextBox pass = allpass[i];
+                    MaskedTextBox pass = allpass[i];
                     pass.Text = data.Read(pass.Name, "Passwords");
                 }
             }
             catch (Exception err3)
             {
                 MessageBox.Show(names.Count.ToString());
+            }
+        }
+
+        private void MouseOverPass(object sender, EventArgs e)
+        {
+            MaskedTextBox pass = sender as MaskedTextBox;
+            if (pass != null)
+            {
+                pass.PasswordChar = '\0';
+            }
+        }
+        private void MouseLeaveLogin(object sender, EventArgs e)
+        {
+            TextBox login = sender as TextBox;
+            if(login != null)
+            {
+                login.DeselectAll();
+                HideCaret(login.Handle);
+            }
+        }
+        private void MouseLeavePass(object sender, EventArgs e)
+        {
+            MaskedTextBox pass = sender as MaskedTextBox;
+            if(pass != null)
+            {
+                pass.PasswordChar = '*';
+                pass.DeselectAll();
+                HideCaret(pass.Handle);
+            }
+        }
+        private void CopyPass(object sender, EventArgs e)
+        {
+            MaskedTextBox pass = sender as MaskedTextBox;
+            if (pass != null)
+            {
+                pass.SelectAll();
+                pass.Copy();
             }
         }
 
@@ -236,7 +277,7 @@ namespace Project_1
 
         private void passwordclick(object sender, EventArgs e)
         {
-            TextBox pass = sender as TextBox;
+            MaskedTextBox pass = sender as MaskedTextBox;
             if (pass != null)
             {
                 InputBoxResult test = InputBox.Show("Введите пароль:",
@@ -270,7 +311,7 @@ namespace Project_1
             //добавление контролов с логинами
             log = new TextBox[n];
             nam = new Label[n];
-            pass = new TextBox[n];
+            pass = new MaskedTextBox[n];
 
             for (int i = 0; i < n; i++)
             {
@@ -282,6 +323,7 @@ namespace Project_1
                 log[i].DoubleClick += new EventHandler(loginclick);
                 log[i].Click += new EventHandler(CopyClick);
                 log[i].ContextMenuStrip = new ContextMenuStrip();
+                log[i].MouseLeave += new EventHandler(MouseLeaveLogin);
 
                 nam[i] = new Label();
                 nam[i].Name = "nam" + x;
@@ -289,14 +331,17 @@ namespace Project_1
                 nam[i].Tag = "nam"+x.ToString();
                 nam[i].DoubleClick += new EventHandler(nameclick);
 
-                pass[i] = new TextBox();
+                pass[i] = new MaskedTextBox();
                 pass[i].Name = "pass" + x;
                 pass[i].Text = "";
                 pass[i].Tag = "pass"+x.ToString();
+                pass[i].PasswordChar = mask;
                 pass[i].Width = 120;
                 pass[i].DoubleClick += new EventHandler(passwordclick);
-                pass[i].Click += new EventHandler(CopyClick);
+                pass[i].Click += new EventHandler(CopyPass);
                 pass[i].ContextMenuStrip = new ContextMenuStrip();
+                pass[i].MouseEnter += new EventHandler(MouseOverPass);
+                pass[i].MouseLeave += new EventHandler(MouseLeavePass);
                 x++;
             }
             for (int i = 0; i < n; i++)
@@ -325,8 +370,15 @@ namespace Project_1
             //Загрузка настроек приложения            
             var settings = new IniFile(@"settings.ini");
             var data = new IniFile(@"data.ini");
-            savingfile = settings.Read("ext", "Settings");
-            if (File.Exists("settings.ini"))
+            if(File.Exists(@"settings.ini"))
+            {
+                savingfile = settings.Read("ext", "Settings");
+            }
+            else
+            {
+                savingfile = "ini";
+            }
+            if (File.Exists(@"settings.ini"))
             {
                 Top = Convert.ToInt32(settings.Read("Top", "Settings"));
                 Left = Convert.ToInt32(settings.Read("Left", "Settings"));
@@ -341,8 +393,14 @@ namespace Project_1
             }
             try
             {
-                //  var settings = new IniFile(@"settings.ini");
-                cnt = Convert.ToInt32(settings.Read("Pages", "Settings"));
+                if (File.Exists(@"settings.ini"))
+                {
+                    cnt = Convert.ToInt32(settings.Read("Pages", "Settings"));
+                }
+                else
+                {
+                    cnt = 0;
+                }
                 //добавление страницы page
                 TabPage[] newtab = new TabPage[cnt];
                 for (int j = 0; j < cnt; j++)
@@ -359,7 +417,7 @@ namespace Project_1
                     //добавление контролов
                     log = new TextBox[n];
                     nam = new Label[n];
-                    pass = new TextBox[n];
+                    pass = new MaskedTextBox[n];
 
                     for (int i = 0; i < n; i++)
                     {
@@ -371,6 +429,7 @@ namespace Project_1
                         log[i].DoubleClick += new EventHandler(loginclick);
                         log[i].Click += new EventHandler(CopyClick);
                         log[i].ContextMenuStrip = new ContextMenuStrip();
+                        log[i].MouseLeave += new EventHandler(MouseLeaveLogin);
 
                         nam[i] = new Label();
                         nam[i].Name = "nam" + x;
@@ -378,14 +437,17 @@ namespace Project_1
                         nam[i].Text = "unnamed";
                         nam[i].DoubleClick += new EventHandler(nameclick);
 
-                        pass[i] = new TextBox();
+                        pass[i] = new MaskedTextBox();
                         pass[i].Name = "pass" + x;
                         pass[i].Tag = "pass"+x.ToString();
                         pass[i].Text = "";
+                        pass[i].PasswordChar = mask;
                         pass[i].Width = 120;
                         pass[i].DoubleClick += new EventHandler(passwordclick);
-                        pass[i].Click += new EventHandler(CopyClick);
+                        pass[i].Click += new EventHandler(CopyPass);
                         pass[i].ContextMenuStrip = new ContextMenuStrip();
+                        pass[i].MouseEnter += new EventHandler(MouseOverPass);
+                        pass[i].MouseLeave += new EventHandler(MouseLeavePass);
 
                         x++;
                     }
@@ -415,12 +477,16 @@ namespace Project_1
             }
             catch (Exception err)
             {
-                MessageBox.Show(err.Message, Progname);
+                MessageBox.Show(err.Message, "qwe");
                 // Application.Restart();
             }
             finally
             {
-                savingfile = settings.Read("ext", "Settings");
+                if (File.Exists(@"settings.ini"))
+                {
+                    savingfile = settings.Read("ext", "Settings");
+                }
+
                 if (savingfile == "xml")
                 {
                     saveasxmlToolStripMenuItem.Checked = true;

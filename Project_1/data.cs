@@ -43,7 +43,7 @@ namespace datas
         //сохраняем с помощью сериализации
         public void SaveListOfDatas(string path)
         {
-            FileStream filestream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write);
+            FileStream filestream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             XmlSerializer xmls = new XmlSerializer(typeof(BindingList<Account>));
             xmls.Serialize(filestream, DataList);
             filestream.Close();
